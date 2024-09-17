@@ -209,7 +209,7 @@ while running:
         turn = 1 - turn
     # Events
     for event in pygame.event.get():
-        if event.type == pygame.MUSEBUTTONDOWN and ((turn == 0 and player1) or (turn == 1 and player2)):
+        if event.type == pygame.MOUSEBUTTONDOWN and ((turn == 0 and player1) or (turn == 1 and player2)):
             for y in range(3):
                 for x in range(3):
                     if grid[y][x].image.collidepoint(pygame.mouse.get_pos()) and grid[y][x].value == ' ':
