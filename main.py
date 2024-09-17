@@ -4,6 +4,8 @@ import os
 import random
 import time
 
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'hide'
+
 import pygame
 
 pygame.init()
@@ -16,8 +18,8 @@ space = width / 30
 size = (width - 2 * space) / 3
 running = True
 
-player1 = False
-player2 = True
+player1 = True
+player2 = False
 
 turn = 0
 place = ['O', 'X']
@@ -125,14 +127,14 @@ def make_random(grid):
 
 def make_best(grid):
     global turn
-    score, move = AI(grid, place[turn], 1)
+    score, move = AI(grid, place[turn], 1, -10, 10)
     print(f'AI chose move {move} with an eval of {score}.')
     if move is not None:
         y, x = move
         grid[y][x].value = place[turn]
         moveLog.append((place[turn], move))
 
-def AI(board, goal, mod):
+def AI(board, goal, mod, alpha, beta):
     empty = get_empty(board)
     best_score = -10 * mod
     best_move = None
@@ -149,15 +151,17 @@ def AI(board, goal, mod):
     for (y, x) in empty:
         temp = copy.deepcopy(board)
         temp[y][x].value = goal
-        score, move = AI(temp, place[1 - goal_index], -1 * mod)
+        score, move = AI(temp, place[1 - goal_index], -1 * mod, alpha, beta)
         if mod == 1:
             if score > best_score:
                 best_score = score
                 best_move = (y, x)
+            alpha = max(alpha, best_score)
         elif mod == -1 and score < best_score:
             best_score = score
             best_move = (y, x)
-        if score == mod: # Already found the best move
+            beta = min(beta, best_score)
+        if alpha >= beta:
             break
     # return result
     return best_score, best_move
@@ -205,7 +209,7 @@ while running:
         turn = 1 - turn
     # Events
     for event in pygame.event.get():
-        if event.type == pygame.MOUSEBUTTONDOWN and ((turn == 0 and player1) or (turn == 1 and player2)):
+        if event.type == pygame.MUSEBUTTONDOWN and ((turn == 0 and player1) or (turn == 1 and player2)):
             for y in range(3):
                 for x in range(3):
                     if grid[y][x].image.collidepoint(pygame.mouse.get_pos()) and grid[y][x].value == ' ':
